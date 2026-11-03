@@ -14,4 +14,4 @@ Use the **Download** button on the game page to save a standalone copy as `pengu
 
 The GitHub Actions workflow deploys the contents of the `main` branch to GitHub Pages whenever a change is pushed. The same Pages URL stays in place as the game is updated.
 
-The repository's Pages source must be set to **GitHub Actions** in **Settings → Pages** for the first deployment.
+GitHub Pages is configured to use **GitHub Actions**. The first deployment may take a few minutes to appear.
