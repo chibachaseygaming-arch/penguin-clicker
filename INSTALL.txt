@@ -1,0 +1,21 @@
+PENGUIN CLICKER APP
+
+IN THIS APP ZIP
+
+- index.html: the complete game. Double-click this file to play offline in your
+  browser; game progress is saved in that browser.
+- manifest.webmanifest, service-worker.js, and icons: files needed to install
+  the game as an app and play offline.
+
+INSTALL THE APP
+
+The easiest way is to open this game at:
+https://chibachaseygaming-arch.github.io/penguin-clicker/
+
+Then use your browser menu:
+- Chrome or Edge: choose "Install Penguin Clicker" or "Install app".
+- iPhone or iPad: tap Share, then "Add to Home Screen".
+
+The files in this ZIP can also be hosted on any HTTPS website to install the
+app and enable offline play. Opening index.html directly still lets you play
+offline without installing the app.

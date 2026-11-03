@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#a9e7f2">
+  <meta name="description" content="Click a penguin, collect fish, and make your own offline-ready penguin clicker app.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/penguin.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/penguin-192.png">
   <title>Penguin Clicker</title>
   <style>
     :root {
@@ -52,9 +56,9 @@
     h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); letter-spacing: -0.04em; }
     .subtitle { margin: 4px 0 0; color: #6a8795; font-size: .92rem; }
 
-    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .header-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; }
 
-    .download-button {
+    .download-button, .install-button {
       display: inline-flex;
       min-height: 44px;
       align-items: center;
@@ -70,7 +74,9 @@
       white-space: nowrap;
     }
 
-    .download-button:hover { background: #d9f1f5; }
+    .download-button:hover, .install-button:hover { background: #d9f1f5; }
+    .install-button { border: 0; cursor: pointer; }
+    .install-button[hidden] { display: none; }
 
     .sound-button, .reset-button {
       border: 0;
@@ -82,7 +88,7 @@
 
     .sound-button { min-width: 44px; min-height: 44px; font-size: 1.15rem; }
     .sound-button:hover, .reset-button:hover { background: #dff3f7; }
-    button:focus-visible { outline: 3px solid #48b9cf; outline-offset: 3px; }
+    button:focus-visible, .download-button:focus-visible { outline: 3px solid #48b9cf; outline-offset: 3px; }
 
     main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .85fr); }
 
@@ -245,9 +251,11 @@
         <p class="subtitle">A little click, a lot of fish. 🐟</p>
       </div>
       <div class="header-actions">
-        <a class="download-button" href="./index.html" download="penguin-clicker.html">↓ Download</a>
-        <button class="sound-button" id="sound-toggle" type="button" aria-label="Turn sound on" title="Turn sound on">🔇</button>
-      </div>
+          <a class="download-button" href="./penguin-clicker-app.zip" download>↓ Download app</a>
+          <a class="download-button" href="./index.html" download="penguin-clicker.html">↓ HTML</a>
+          <button class="install-button" id="install-app" type="button">＋ Install app</button>
+          <button class="sound-button" id="sound-toggle" type="button" aria-label="Turn sound on" title="Turn sound on">🔇</button>
+        </div>
     </header>
     <main>
       <section class="play-area" id="play-area" aria-label="Clicking game">
@@ -288,6 +296,37 @@
   <script>
     (() => {
       const saveKey = "penguin-clicker-save";
+      const installButton = document.querySelector("#install-app");
+      let installPrompt = null;
+      const isInstalled = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+      installButton.hidden = isInstalled;
+
+      window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+        installPrompt = event;
+      });
+
+      window.addEventListener("appinstalled", () => {
+        installPrompt = null;
+        installButton.hidden = true;
+      });
+
+      installButton.addEventListener("click", async () => {
+        if (!installPrompt) {
+          window.alert("Install Penguin Clicker from your browser menu: choose 'Install app' in Chrome or Edge, or 'Add to Home Screen' on iPhone or iPad.");
+          return;
+        }
+
+        await installPrompt.prompt();
+        installPrompt = null;
+      });
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.js").catch(error => {
+          console.error("Could not enable offline play.", error);
+        });
+      }
+
       const initialState = {
         fish: 0, totalFish: 0, clicks: 0, clickPower: 1, autoPower: 0,
         clickLevel: 0, autoLevel: 0, bestStreak: 0, streak: 0,

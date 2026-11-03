@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "Penguin Clicker",
+  "short_name": "Penguin Clicker",
+  "description": "Click a penguin, collect fish, and grow your fish stash.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#d8f6fb",
+  "theme_color": "#a9e7f2",
+  "icons": [
+    {
+      "src": "./icons/penguin-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/penguin-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/penguin.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
