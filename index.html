@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a9e7f2">
+  <title>Penguin Clicker</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: #17364b;
+      background: #d8f6fb;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+      background:
+        radial-gradient(ellipse at 50% 100%, #fff 0 15%, transparent 15.5%),
+        linear-gradient(180deg, #bceff5 0%, #e8fbff 65%, #fff 65%);
+    }
+
+    button { font: inherit; }
+
+    .game {
+      width: min(100%, 900px);
+      overflow: hidden;
+      border: 1px solid #ffffffd9;
+      border-radius: 30px;
+      background: #ffffffeb;
+      box-shadow: 0 24px 70px #27708b26;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 30px;
+      border-bottom: 1px solid #e6f3f6;
+    }
+
+    h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); letter-spacing: -0.04em; }
+    .subtitle { margin: 4px 0 0; color: #6a8795; font-size: .92rem; }
+
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+
+    .download-button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 15px;
+      border-radius: 999px;
+      background: #e8f8fa;
+      color: #286879;
+      font-size: .88rem;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .download-button:hover { background: #d9f1f5; }
+
+    .sound-button, .reset-button {
+      border: 0;
+      border-radius: 999px;
+      background: #eef9fb;
+      color: #3c6677;
+      cursor: pointer;
+    }
+
+    .sound-button { min-width: 44px; min-height: 44px; font-size: 1.15rem; }
+    .sound-button:hover, .reset-button:hover { background: #dff3f7; }
+    button:focus-visible { outline: 3px solid #48b9cf; outline-offset: 3px; }
+
+    main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, .85fr); }
+
+    .play-area {
+      position: relative;
+      display: flex;
+      min-height: 470px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 30px 20px 26px;
+      background:
+        radial-gradient(ellipse at 50% 88%, #d2f3f4 0 34%, transparent 34.5%),
+        linear-gradient(#e9fbff, #f8feff);
+    }
+
+    .snow { position: absolute; color: #fff; pointer-events: none; user-select: none; }
+    .snow.one { top: 10%; left: 13%; font-size: 2rem; }
+    .snow.two { top: 24%; right: 12%; font-size: 1.3rem; }
+    .snow.three { top: 49%; left: 8%; font-size: 1rem; }
+    .snow.four { top: 13%; right: 34%; font-size: .9rem; }
+
+    .score-label {
+      z-index: 1;
+      margin: 0;
+      color: #638292;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .score {
+      z-index: 1;
+      margin: 4px 0 12px;
+      color: #17364b;
+      font-size: clamp(2.6rem, 8vw, 4.3rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -.06em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .penguin-button {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: min(62vw, 250px);
+      aspect-ratio: 1;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: #d7f4f7;
+      box-shadow: inset 0 -12px 0 #c6e9ed, 0 14px 28px #5c9ca826;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+
+    .penguin-button:hover { transform: translateY(-4px) rotate(-2deg); }
+    .penguin-button:active, .penguin-button.pressed {
+      transform: translateY(5px) scale(.96);
+      box-shadow: inset 0 -5px 0 #c6e9ed, 0 5px 12px #5c9ca826;
+    }
+
+    .penguin {
+      display: block;
+      font-size: clamp(7rem, 22vw, 11rem);
+      line-height: 1;
+      filter: drop-shadow(0 10px 4px #25465720);
+      user-select: none;
+      transition: transform .15s ease;
+    }
+
+    .penguin-button:hover .penguin { transform: rotate(4deg); }
+    .tap-hint { z-index: 1; margin: 17px 0 0; color: #6e8d9a; font-size: .94rem; }
+
+    .side-panel { padding: 26px 24px; background: #fff; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat {
+      padding: 14px;
+      border: 1px solid #e7f1f3;
+      border-radius: 16px;
+      background: #f8fcfd;
+    }
+    .stat-label { display: block; color: #7b929c; font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .stat-value { display: block; margin-top: 5px; font-size: 1.28rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+
+    .shop-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 27px 0 12px; }
+    h2 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
+    .shop-heading span { color: #7b929c; font-size: .8rem; }
+
+    .upgrade {
+      display: grid;
+      width: 100%;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 9px;
+      padding: 12px;
+      border: 1px solid #e4eff1;
+      border-radius: 16px;
+      background: #fff;
+      color: #17364b;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .15s ease, transform .15s ease, background .15s ease;
+    }
+
+    .upgrade:hover:not(:disabled) { transform: translateY(-2px); border-color: #9bdce5; background: #f8feff; }
+    .upgrade:disabled { cursor: not-allowed; opacity: .58; }
+    .upgrade-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #e8f8fa; font-size: 1.35rem; }
+    .upgrade-name { display: block; font-size: .91rem; font-weight: 800; }
+    .upgrade-description { display: block; margin-top: 3px; color: #78909a; font-size: .74rem; }
+    .upgrade-cost { color: #397c88; font-size: .8rem; font-weight: 900; white-space: nowrap; }
+
+    .milestone {
+      min-height: 42px;
+      margin-top: 17px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #fff7df;
+      color: #856725;
+      font-size: .8rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .reset-button { display: block; margin: 14px auto 0; padding: 7px 12px; font-size: .78rem; }
+    .pop {
+      position: absolute;
+      z-index: 3;
+      color: #247a8b;
+      font-size: 1.4rem;
+      font-weight: 900;
+      pointer-events: none;
+      animation: float-up .8s ease-out forwards;
+    }
+    @keyframes float-up { from { opacity: 1; transform: translateY(0) scale(.8); } to { opacity: 0; transform: translateY(-75px) scale(1.15); } }
+    @media (max-width: 700px) {
+      body { padding: 12px; }
+      .game { border-radius: 24px; }
+      header { padding: 19px 20px; }
+      main { grid-template-columns: 1fr; }
+      .play-area { min-height: 400px; }
+      .side-panel { padding: 22px 20px 25px; }
+      .shop-heading { margin-top: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <header>
+      <div>
+        <h1>Penguin Clicker</h1>
+        <p class="subtitle">A little click, a lot of fish. 🐟</p>
+      </div>
+      <div class="header-actions">
+        <a class="download-button" href="./index.html" download="penguin-clicker.html">↓ Download</a>
+        <button class="sound-button" id="sound-toggle" type="button" aria-label="Turn sound on" title="Turn sound on">🔇</button>
+      </div>
+    </header>
+    <main>
+      <section class="play-area" id="play-area" aria-label="Clicking game">
+        <span class="snow one" aria-hidden="true">❄</span>
+        <span class="snow two" aria-hidden="true">✦</span>
+        <span class="snow three" aria-hidden="true">❄</span>
+        <span class="snow four" aria-hidden="true">✦</span>
+        <p class="score-label">Fish collected</p>
+        <p class="score" id="score" aria-live="polite">0</p>
+        <button class="penguin-button" id="penguin" type="button" aria-label="Click the penguin to collect fish">
+          <span class="penguin" aria-hidden="true">🐧</span>
+        </button>
+        <p class="tap-hint">Click your penguin to collect fish!</p>
+      </section>
+      <aside class="side-panel">
+        <div class="stats">
+          <div class="stat"><span class="stat-label">Per click</span><span class="stat-value" id="per-click">1 🐟</span></div>
+          <div class="stat"><span class="stat-label">Per second</span><span class="stat-value" id="per-second">0 🐟</span></div>
+          <div class="stat"><span class="stat-label">Best streak</span><span class="stat-value" id="streak">0 🔥</span></div>
+          <div class="stat"><span class="stat-label">Total clicks</span><span class="stat-value" id="clicks">0</span></div>
+        </div>
+        <div class="shop-heading"><h2>Penguin helpers</h2><span>Make fish faster</span></div>
+        <button class="upgrade" id="click-upgrade" type="button">
+          <span class="upgrade-icon" aria-hidden="true">🐠</span>
+          <span><span class="upgrade-name">Fishy flippers</span><span class="upgrade-description">More fish with every click</span></span>
+          <span class="upgrade-cost" id="click-cost">10 🐟</span>
+        </button>
+        <button class="upgrade" id="auto-upgrade" type="button">
+          <span class="upgrade-icon" aria-hidden="true">🪣</span>
+          <span><span class="upgrade-name">Helpful seal</span><span class="upgrade-description">Brings fish automatically</span></span>
+          <span class="upgrade-cost" id="auto-cost">25 🐟</span>
+        </button>
+        <div class="milestone" id="milestone" role="status">Your first fish is waiting!</div>
+        <button class="reset-button" id="reset" type="button">Start over</button>
+      </aside>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const saveKey = "penguin-clicker-save";
+      const initialState = {
+        fish: 0, totalFish: 0, clicks: 0, clickPower: 1, autoPower: 0,
+        clickLevel: 0, autoLevel: 0, bestStreak: 0, streak: 0,
+        lastClick: 0, sound: false
+      };
+      let state = { ...initialState };
+      let audioContext;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(saveKey));
+        if (saved && typeof saved === "object") {
+          for (const key of Object.keys(initialState)) {
+            if (typeof saved[key] === typeof initialState[key] && Number.isFinite(saved[key]) || key === "sound" && typeof saved[key] === "boolean") {
+              state[key] = saved[key];
+            }
+          }
+        }
+      } catch {
+        localStorage.removeItem(saveKey);
+      }
+
+      const elements = {
+        score: document.querySelector("#score"),
+        perClick: document.querySelector("#per-click"),
+        perSecond: document.querySelector("#per-second"),
+        streak: document.querySelector("#streak"),
+        clicks: document.querySelector("#clicks"),
+        clickCost: document.querySelector("#click-cost"),
+        autoCost: document.querySelector("#auto-cost"),
+        clickUpgrade: document.querySelector("#click-upgrade"),
+        autoUpgrade: document.querySelector("#auto-upgrade"),
+        milestone: document.querySelector("#milestone"),
+        penguin: document.querySelector("#penguin"),
+        playArea: document.querySelector("#play-area"),
+        sound: document.querySelector("#sound-toggle")
+      };
+      const clickPrice = () => Math.floor(10 * Math.pow(1.65, state.clickLevel));
+      const autoPrice = () => Math.floor(25 * Math.pow(1.7, state.autoLevel));
+
+      function save() {
+        try {
+          localStorage.setItem(saveKey, JSON.stringify(state));
+        } catch (error) {
+          console.warn("Could not save your penguin progress.", error);
+        }
+      }
+
+      function render() {
+        elements.score.textContent = Math.floor(state.fish).toLocaleString();
+        elements.perClick.textContent = `${state.clickPower} 🐟`;
+        elements.perSecond.textContent = `${state.autoPower} 🐟`;
+        elements.streak.textContent = `${state.bestStreak} 🔥`;
+        elements.clicks.textContent = state.clicks.toLocaleString();
+        elements.clickCost.textContent = `${clickPrice().toLocaleString()} 🐟`;
+        elements.autoCost.textContent = `${autoPrice().toLocaleString()} 🐟`;
+        elements.clickUpgrade.disabled = state.fish < clickPrice();
+        elements.autoUpgrade.disabled = state.fish < autoPrice();
+        elements.sound.textContent = state.sound ? "🔊" : "🔇";
+        elements.sound.setAttribute("aria-label", state.sound ? "Turn sound off" : "Turn sound on");
+        elements.sound.title = state.sound ? "Turn sound off" : "Turn sound on";
+        const total = Math.floor(state.totalFish);
+        if (total >= 1000) elements.milestone.textContent = "Incredible! The whole iceberg is fed! 🏆";
+        else if (total >= 100) elements.milestone.textContent = "Amazing! The penguin is swimming in fish! 🎉";
+        else if (total >= 25) elements.milestone.textContent = "Nice work! Your penguin has a full belly! 🐧";
+        else if (total >= 1) elements.milestone.textContent = "Yum! Keep clicking to earn more fish.";
+        else elements.milestone.textContent = "Your first fish is waiting!";
+      }
+
+      function playSound() {
+        if (!state.sound) return;
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(580, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.12);
+        } catch (error) {
+          console.warn("Could not play the click sound.", error);
+          state.sound = false;
+          render();
+        }
+      }
+
+      function popFish(event) {
+        const bubble = document.createElement("span");
+        bubble.className = "pop";
+        bubble.textContent = `+${state.clickPower} 🐟`;
+        const bounds = elements.playArea.getBoundingClientRect();
+        bubble.style.left = `${Math.max(8, Math.min(bounds.width - 100, event.clientX - bounds.left))}px`;
+        bubble.style.top = `${Math.max(8, event.clientY - bounds.top)}px`;
+        elements.playArea.append(bubble);
+        bubble.addEventListener("animationend", () => bubble.remove(), { once: true });
+      }
+
+      elements.penguin.addEventListener("click", event => {
+        const now = Date.now();
+        state.streak = now - state.lastClick < 1000 ? state.streak + 1 : 1;
+        state.lastClick = now;
+        state.bestStreak = Math.max(state.bestStreak, state.streak);
+        state.clicks++;
+        state.fish += state.clickPower;
+        state.totalFish += state.clickPower;
+        elements.penguin.classList.add("pressed");
+        window.setTimeout(() => elements.penguin.classList.remove("pressed"), 120);
+        popFish(event);
+        playSound();
+        render();
+        save();
+      });
+
+      elements.clickUpgrade.addEventListener("click", () => {
+        const price = clickPrice();
+        if (state.fish < price) return;
+        state.fish -= price;
+        state.clickLevel++;
+        state.clickPower++;
+        render();
+        save();
+      });
+
+      elements.autoUpgrade.addEventListener("click", () => {
+        const price = autoPrice();
+        if (state.fish < price) return;
+        state.fish -= price;
+        state.autoLevel++;
+        state.autoPower += 1;
+        render();
+        save();
+      });
+
+      elements.sound.addEventListener("click", () => {
+        state.sound = !state.sound;
+        render();
+        save();
+        if (state.sound) playSound();
+      });
+
+      document.querySelector("#reset").addEventListener("click", () => {
+        if (!window.confirm("Start a fresh game? Your fish and upgrades will be lost.")) return;
+        state = { ...initialState };
+        save();
+        render();
+      });
+
+      window.setInterval(() => {
+        if (state.autoPower < 1) return;
+        state.fish += state.autoPower;
+        state.totalFish += state.autoPower;
+        render();
+        save();
+      }, 1000);
+
+      render();
+    })();
+  </script>
+</body>
+</html>
